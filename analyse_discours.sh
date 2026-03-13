@@ -29,3 +29,4 @@ whisper-cli -m "$HOME/.local/share/whisper.cpp/models/ggml-base.bin" -f audio_fi
 echo "✅ Terminé !"
 echo "Dossier : $OUTPUT_DIR"
 echo "Fichiers générés : audio_final.wav.txt et audio_final.wav.srt"
+echo "ps: pour ecouter c'est avec mpv"
