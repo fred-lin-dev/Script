@@ -1,3 +1,8 @@
+# Suppression de notes Anki via AnkiConnect
+# Usage: python delete_anki_note.py <note_id> [note_id ...]
+# Prérequis: Anki ouvert avec l'addon AnkiConnect installé (port 8765)
+# Exemple: python delete_anki_note.py 1234567890
+
 import json
 import urllib.request
 import sys

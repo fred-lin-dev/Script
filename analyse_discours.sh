@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Analyse du discours d'une vidéo YouTube (transcription + résumé via LLM)
+# Usage: ./analyse_discours.sh <URL_YOUTUBE>
+# Exemple: ./analyse_discours.sh https://youtu.be/xxx
+
 # Vérification de l'argument (le lien YouTube)
 if [ -z "$1" ]; then
     echo "Usage: ./analyse_discours.sh <URL_YOUTUBE>"
