@@ -22,6 +22,7 @@ Collection de scripts shell et Python pour automatiser des tâches courantes.
 | `mirror.sh` | Fait un miroir complet d'un site web (pages statiques + vidéos) | `wget`, `yt-dlp` | `./mirror.sh <URL> [cookies.txt]` |
 | `mkpasswd.sh` | Génère des mots de passe forts aléatoires (longueur, quantité, prononçable) | `xclip` ou `wl-copy` *(optionnel)* | `./mkpasswd.sh [longueur] [nombre] [-s\|-p]` |
 | `network_scan.sh` | Scanne les appareils connectés sur le réseau local | `nmap` | `./network_scan.sh [plage_réseau]` |
+| `portswigger_dl.py` | Mirror hors-ligne de la Web Security Academy (cours, labs, learning paths) avec index de navigation | `python3` *(stdlib uniquement)* | `python3 portswigger_dl.py [dossier_sortie] [cookies.txt]` |
 | `screenshot_ocr.sh` | Capture une zone d'écran, extrait le texte (OCR) et le copie dans le presse-papiers | `scrot`, `tesseract`, `xclip` | `./screenshot_ocr.sh [langue]` |
 | `serve.sh` | Lance un serveur HTTP local instantané depuis un dossier | `python3` | `./serve.sh [dossier] [port]` |
 | `srt_to_txt.sh` | Convertit un fichier `.srt` en texte brut sans timestamps ni numéros | `xclip` ou `wl-copy` *(optionnel)* | `./srt_to_txt.sh <fichier.srt> [sortie.txt]` |
