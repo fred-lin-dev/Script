@@ -10,13 +10,15 @@
 #   ./transcribe.sh memo.m4a
 #   ./transcribe.sh https://youtu.be/xxx en
 #
-# Modèle whisper surchargeable : WHISPER_MODEL=.../ggml-large-v3.bin ./transcribe.sh ...
+# Modèle : large-v3 par défaut (WER français ~7,8 % contre ~30,5 % pour base).
+# Surchargeable pour privilégier la vitesse :
+#   WHISPER_MODEL=~/.local/share/whisper.cpp/models/ggml-base.bin ./transcribe.sh memo.m4a
 
 set -euo pipefail
 
 INPUT="${1:-}"
 LANG="${2:-auto}"
-MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper.cpp/models/ggml-base.bin}"
+MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper.cpp/models/ggml-large-v3.bin}"
 
 if [ -z "$INPUT" ]; then
     echo "Usage: $0 <fichier|URL> [langue]"
