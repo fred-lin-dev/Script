@@ -25,22 +25,22 @@ yt-dlp \
     --skip-download \
     --write-subs \
     --sub-lang "$LANG" \
-    --convert-subs srt \
+    --convert-subs vtt \
     -o "$OUTPUT_DIR/%(title)s.%(ext)s" \
     "$URL" 2>/dev/null
 
 # Si pas de sous-titres manuels, essayer les auto-générés
-if [ $? -ne 0 ] || ! ls "$OUTPUT_DIR"/*.srt &>/dev/null 2>&1; then
+if [ $? -ne 0 ] || ! ls "$OUTPUT_DIR"/*.vtt &>/dev/null 2>&1; then
     echo "Pas de sous-titres manuels, tentative avec les sous-titres auto-générés..."
     yt-dlp \
         --skip-download \
         --write-auto-subs \
         --sub-lang "$LANG" \
-        --convert-subs srt \
+        --convert-subs vtt \
         -o "$OUTPUT_DIR/%(title)s.%(ext)s" \
         "$URL"
 fi
 
 echo ""
 echo "Fichiers téléchargés dans : $OUTPUT_DIR"
-ls -lh "$OUTPUT_DIR"/*.srt 2>/dev/null || echo "Aucun sous-titre trouvé pour la langue '$LANG'."
+ls -lh "$OUTPUT_DIR"/*.vtt 2>/dev/null || echo "Aucun sous-titre trouvé pour la langue '$LANG'."

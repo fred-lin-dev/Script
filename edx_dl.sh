@@ -41,7 +41,7 @@ yt-dlp \
   --write-subs \
   --write-auto-subs \
   --sub-langs "fr,en" \
-  --convert-subs srt \
+  --convert-subs vtt \
   --output "$COURSE_DIR/%(playlist_index)s - %(title)s.%(ext)s" \
   --merge-output-format mkv \
   "$URL"
@@ -51,8 +51,8 @@ echo "====================================================="
 echo " RÉSUMÉ"
 echo "====================================================="
 VIDEO_COUNT=$(find "$COURSE_DIR" -type f -name "*.mkv" | wc -l)
-SRT_COUNT=$(find "$COURSE_DIR" -type f -name "*.srt" | wc -l)
+VTT_COUNT=$(find "$COURSE_DIR" -type f -name "*.vtt" | wc -l)
 echo " Vidéos       : $VIDEO_COUNT  →  $COURSE_DIR/"
-echo " Sous-titres  : $SRT_COUNT"
+echo " Sous-titres  : $VTT_COUNT"
 echo "====================================================="
 echo ""
