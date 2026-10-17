@@ -21,38 +21,50 @@ scan() {
 
 if command -v fzf &>/dev/null; then
     # Mode interactif : naviguer dans les dossiers
-    current="$START_DIR"
+    current=$(realpath "$START_DIR" 2>/dev/null || echo "$START_DIR")
     while true; do
-        selection=$(
-            du -h --max-depth=1 "$current" 2>/dev/null \
-            | sort -rh \
-            | awk -v cur="$current" '
-                NR==1 { total=$0; next }
-                { printf "%-10s %s\n", $1, $2 }
-            ' \
-            | fzf \
-                --header="$(du -sh "$current" 2>/dev/null | cut -f1) total  —  $current  (Entrée=entrer, Échap=quitter, backspace=remonter)" \
-                --bind="backward-delete-char:abort" \
-                --prompt="Dossier > " \
-                --no-sort \
-                --ansi
-        )
+        # du sort "taille<TAB>chemin". On conserve la tabulation comme
+        # séparateur pour que les dossiers contenant des espaces restent
+        # intacts (un awk sur $2 les tronquait au premier espace).
+        listing=$(du -h --max-depth=1 "$current" 2>/dev/null | sort -rh \
+            | awk -F'\t' 'NR>1 { printf "%s\t%s\n", $1, $2 }')
 
+        if [ -z "$listing" ]; then
+            echo "Aucun sous-dossier lisible dans : $current"
+            break
+        fi
+
+        total=$(du -sh "$current" 2>/dev/null | cut -f1)
+        selection=$(printf '%s\n' "$listing" | fzf \
+            --header="$total total  —  $current  (Entrée=entrer, Backspace=remonter, Échap=quitter)" \
+            --expect=esc \
+            --bind="bspace:abort" \
+            --prompt="Dossier > " \
+            --no-sort)
         code=$?
-        # Échap ou backspace
-        [ $code -ne 0 ] && {
+
+        # 2 = fzf n'a pas pu démarrer (option invalide, ou pas de terminal
+        # interactif). On s'arrête net plutôt que de remonter en silence
+        # jusqu'à la racine en répétant l'erreur à chaque niveau.
+        if [ $code -eq 2 ]; then
+            echo "fzf n'a pas pu démarrer (terminal non interactif ?)." >&2
+            exit 1
+        fi
+
+        # Backspace ou Ctrl-C : remonter d'un niveau
+        if [ $code -ne 0 ]; then
             parent=$(dirname "$current")
             [ "$parent" = "$current" ] && break
             current="$parent"
             continue
-        }
-
-        selected_dir=$(echo "$selection" | awk '{print $2}')
-        [ -z "$selected_dir" ] && break
-
-        if [ -d "$selected_dir" ]; then
-            current="$selected_dir"
         fi
+
+        # Avec --expect, la 1re ligne est la touche pressée (vide si Entrée)
+        [ "$(printf '%s\n' "$selection" | sed -n 1p)" = "esc" ] && break
+
+        selected_dir=$(printf '%s\n' "$selection" | sed -n 2p | cut -f2-)
+        [ -z "$selected_dir" ] && break
+        [ -d "$selected_dir" ] && current="$selected_dir"
     done
 else
     # Mode simple sans fzf

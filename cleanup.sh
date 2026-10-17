@@ -73,7 +73,39 @@ if command -v trash-empty &>/dev/null; then
 fi
 
 # Fichiers temporaires
-clean_section "Fichiers /tmp" "/tmp" "sudo rm -rf /tmp/* 2>/dev/null; true"
+# /tmp héberge les sockets de la session en cours (.X11-unix, .ICE-unix, tmux,
+# ssh-agent, dossiers privés systemd). Un « sudo rm -rf /tmp/* » peut couper la
+# session graphique et tuer les sessions tmux/ssh en cours. On se limite donc
+# aux entrées appartenant à l'utilisateur courant, âgées de plus d'un jour, en
+# épargnant explicitement les emplacements de sockets. Plus besoin de sudo.
+tmp_prune() {
+    find /tmp -mindepth 1 -maxdepth 1 \
+        -uid "$(id -u)" \
+        -mtime +1 \
+        ! -name '.X11-unix'  ! -name '.ICE-unix' \
+        ! -name '.font-unix' ! -name '.XIM-unix' \
+        ! -name '.Test-unix' ! -name '.esd-*' \
+        ! -name 'systemd-private-*' ! -name 'snap-private-*' \
+        ! -name 'tmux-*'     ! -name 'ssh-*' \
+        ! -name 'pulse-*'    ! -name 'dbus-*' \
+        ! -name 'wayland-*'  ! -name 'gnupg*' \
+        ! -name '.XAUTHORITY*' \
+        "$@" 2>/dev/null
+}
+
+tmp_count=$(tmp_prune -print | wc -l)
+if [ "$tmp_count" -eq 0 ]; then
+    echo "  OK  Fichiers /tmp : rien de plus vieux qu'un jour"
+else
+    tmp_size=$(tmp_prune -print0 | du -shc --files0-from=- 2>/dev/null | tail -1 | cut -f1)
+    if $DRY; then
+        echo "  [DRY] Fichiers /tmp : $tmp_count entrée(s) > 1 jour (${tmp_size:-?})"
+        tmp_prune -print | sed 's/^/    /'
+    else
+        tmp_prune -exec rm -rf {} +
+        echo "  OK  Fichiers /tmp ($tmp_count entrée(s), ${tmp_size:-?})"
+    fi
+fi
 
 # Logs journalctl (garder 7 jours)
 if command -v journalctl &>/dev/null; then

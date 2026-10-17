@@ -19,7 +19,7 @@
 set -euo pipefail
 
 INPUT="${1:-}"
-LANG="${2:-auto}"
+WLANG="${2:-auto}"
 MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper.cpp/models/ggml-large-v3.bin}"
 
 if [ -z "$INPUT" ]; then
@@ -31,7 +31,7 @@ fi
 
 # Confusions fréquentes : ce sont des codes pays, pas des codes langue. On refuse
 # tout de suite plutôt qu'après le téléchargement et une heure de transcription.
-case "$LANG" in
+case "$WLANG" in
     cn) echo "Erreur : 'cn' est le code pays. Pour le chinois, utilise : zh"; exit 1 ;;
     jp) echo "Erreur : 'jp' est le code pays. Pour le japonais, utilise : ja"; exit 1 ;;
     kr) echo "Erreur : 'kr' est le code pays. Pour le coréen, utilise : ko"; exit 1 ;;
@@ -85,8 +85,8 @@ fi
 OUTPUT_DIR="Transcription_${BASENAME}_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$OUTPUT_DIR"
 
-echo "Transcription en cours (langue: $LANG)..."
-whisper-cli -m "$MODEL" -f "$AUDIO" -l "$LANG" -otxt -ovtt -of "$OUTPUT_DIR/$BASENAME"
+echo "Transcription en cours (langue: $WLANG)..."
+whisper-cli -m "$MODEL" -f "$AUDIO" -l "$WLANG" -otxt -ovtt -of "$OUTPUT_DIR/$BASENAME"
 
 # On garde l'audio converti : utile pour réécouter un passage douteux
 mv "$AUDIO" "$OUTPUT_DIR/${BASENAME}.wav"
