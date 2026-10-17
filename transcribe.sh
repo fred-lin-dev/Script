@@ -4,7 +4,9 @@
 # avec whisper.cpp. Produit un .txt et un .vtt dans un dossier horodaté.
 #
 # Usage: ./transcribe.sh <fichier|URL> [langue]
-# Langues: fr, en, auto (défaut: auto)
+# Langues (ISO 639-1) : fr=français  en=anglais  zh=chinois  ja=japonais  ko=coréen
+#                       auto = détection sur les 30 premières secondes (défaut)
+# Attention : zh/ja/ko, pas cn/jp/kr — ce sont des codes pays, Whisper les refuse.
 # Exemples:
 #   ./transcribe.sh video.mp4 fr
 #   ./transcribe.sh memo.m4a
@@ -22,9 +24,18 @@ MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper.cpp/models/ggml-large-v3.bin}
 
 if [ -z "$INPUT" ]; then
     echo "Usage: $0 <fichier|URL> [langue]"
-    echo "  langues : fr, en, auto (défaut: auto)"
+    echo "  langues : fr (français)  en (anglais)  zh (chinois)  ja (japonais)  ko (coréen)"
+    echo "            auto = détection automatique (défaut)"
     exit 1
 fi
+
+# Confusions fréquentes : ce sont des codes pays, pas des codes langue. On refuse
+# tout de suite plutôt qu'après le téléchargement et une heure de transcription.
+case "$LANG" in
+    cn) echo "Erreur : 'cn' est le code pays. Pour le chinois, utilise : zh"; exit 1 ;;
+    jp) echo "Erreur : 'jp' est le code pays. Pour le japonais, utilise : ja"; exit 1 ;;
+    kr) echo "Erreur : 'kr' est le code pays. Pour le coréen, utilise : ko"; exit 1 ;;
+esac
 
 need() {
     command -v "$1" >/dev/null 2>&1 || { echo "Erreur : $1 non installé"; exit 1; }
